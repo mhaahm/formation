@@ -12,7 +12,10 @@
                       {{ course.participants }} Participant<span v-if="parseInt(course.participants) > 1 ">s</span>
                     </span>  </div>
                     <div class="flex justify-between items-center">
-                        <div class="text-2xl">{{ course.title }}</div>
+                        <div class="text-2xl">
+                            {{ course.title }} <br>
+                            <span class=" font-semibold text-green-500 ">{{ convert(course.total_duration) }}</span>
+                        </div>
                         <div class="text-sm text-gray-300">{{ course.episodes_count }} Episodes</div>
                     </div>
                     <div class="text-sm text-gray-400">{{ course.description }}</div>
@@ -22,6 +25,9 @@
                     </div>
                    </div>
             </div>
+        <inertia-link v-for="link in courses.links" v-bind:key="link.label" :href="link.url">
+            <span v-html="link.label" class="p-1"></span>
+        </inertia-link>
     </app-layout>
 </template>
 <script>
@@ -36,12 +42,22 @@
         },
         data() {
             return {
-                courseList: this.courses
+                courseList: this.courses.data
             }
         },
         computed: {
             sortedArray(){
                 return _.orderBy(this.courseList,'id',['desc'])
+            }
+        },
+        methods: {
+            convert(timestamp) {
+                let hour = timestamp/3600;
+                let minute = timestamp/60 - hour/60;
+                let second = timestamp%60;
+                hour = Math.round(hour);
+                minute = Math.round(minute);
+                return hour.toString().padStart(2,0)+':'+minute.toString().padStart(2,0)+':'+second.toString().padStart(2,0)
             }
         }
     }

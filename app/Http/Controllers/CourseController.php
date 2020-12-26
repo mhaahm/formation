@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\Episode;
+use App\Youtube\YoutubeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
@@ -18,11 +20,18 @@ class CourseController extends Controller
                       FROM complitition
                       INNER JOIN episodes on complitition.episode_id=episodes.id
                       where episodes.course_id=courses.id) as participants"
-            ))->withCount('episodes')
-            ->get()
-        ->sortByDesc(function($data,$key) {
-            return (int)$data->id;
-        });
+            ))
+            ->addSelect(DB::raw(
+                '
+                (
+                    select SUM(duration)
+                    from episodes
+                    where episodes.course_id=courses.id
+                ) as total_duration
+                '
+            ))
+            ->withCount('episodes')->latest()
+            ->paginate(5);
         return Inertia::render("Courses/index",[
             'courses' => $courses
         ]);
@@ -51,21 +60,25 @@ class CourseController extends Controller
         return $user->episodes;
     }
 
-    public function saveFormations(Request $request)
+    public function saveFormations(Request $request,YoutubeService $youtube)
     {
+
         $request->validate([
             'title' => 'required',
             'description' => 'required',
             'episodes' => ['required','array'],
             'episodes.*.title' => 'required',
             'episodes.*.description' => 'required',
-            'episodes.*.video_url' => 'required'
+            'episodes.*.video_url' => 'required|regex:/http(s?):\/\/www\.youtube\.com\/embed\/(.+)/'
         ]);
+        //https://www.youtube.com/embed/yYEZOQVKy8w
         $course = Course::create($request->all());
         // dd($request->input('episodes'));
         foreach ($request->input('episodes') as $episode)
         {
+            $duration =  $youtube->handleVideoDuration($episode['video_url']);
             $episode['course_id'] = $course->id;
+            $episode['duration'] = $duration;
             $episode = Episode::create($episode);
         }
         return Redirect::route("dashboard")->with('success','La formation est mise en ligne avec success');

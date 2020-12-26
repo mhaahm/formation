@@ -5,7 +5,8 @@
         </template>
         <div class="py-3 m-5">
             <div class="text-2xl">{{ episodeToshow.title }}</div>
-            <!--iframe class="w-full h-screen" :src="episodeToshow.video_url" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe-->
+            <iframe class="h-screen" :src="episodeToshow.video_url" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
+            style="width: 60%"></iframe>
             <div class="text-sm text-gray-400">{{ episodeToshow.description }}</div>
             <progress-barre :watched-episode="watcheds" :episodes="course.episodes"></progress-barre>
             <div class="mt-8">

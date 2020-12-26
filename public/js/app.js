@@ -3459,6 +3459,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -3470,12 +3476,22 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      courseList: this.courses
+      courseList: this.courses.data
     };
   },
   computed: {
     sortedArray: function sortedArray() {
       return _.orderBy(this.courseList, 'id', ['desc']);
+    }
+  },
+  methods: {
+    convert: function convert(timestamp) {
+      var hour = timestamp / 3600;
+      var minute = timestamp / 60 - hour / 60;
+      var second = timestamp % 60;
+      hour = Math.round(hour);
+      minute = Math.round(minute);
+      return hour.toString().padStart(2, 0) + ':' + minute.toString().padStart(2, 0) + ':' + second.toString().padStart(2, 0);
     }
   }
 });
@@ -3593,6 +3609,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Layouts_AppLayout__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../../Layouts/AppLayout */ "./resources/js/Layouts/AppLayout.vue");
 /* harmony import */ var _progressButton__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./progressButton */ "./resources/js/Pages/Courses/progressButton.vue");
 /* harmony import */ var _progressBarre__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./progressBarre */ "./resources/js/Pages/Courses/progressBarre.vue");
+//
 //
 //
 //
@@ -48023,7 +48040,14 @@ var render = function() {
             _vm._v(" "),
             _c("div", { staticClass: "flex justify-between items-center" }, [
               _c("div", { staticClass: "text-2xl" }, [
-                _vm._v(_vm._s(course.title))
+                _vm._v(
+                  "\n                        " + _vm._s(course.title) + " "
+                ),
+                _c("br"),
+                _vm._v(" "),
+                _c("span", { staticClass: " font-semibold text-green-500 " }, [
+                  _vm._v(_vm._s(_vm.convert(course.total_duration)))
+                ])
               ]),
               _vm._v(" "),
               _c("div", { staticClass: "text-sm text-gray-300" }, [
@@ -48060,6 +48084,19 @@ var render = function() {
             ])
           ])
         ])
+      }),
+      _vm._v(" "),
+      _vm._l(_vm.courses.links, function(link) {
+        return _c(
+          "inertia-link",
+          { key: link.label, attrs: { href: link.url } },
+          [
+            _c("span", {
+              staticClass: "p-1",
+              domProps: { innerHTML: _vm._s(link.label) }
+            })
+          ]
+        )
       })
     ],
     2
@@ -48171,6 +48208,18 @@ var render = function() {
           _c("div", { staticClass: "text-2xl" }, [
             _vm._v(_vm._s(_vm.episodeToshow.title))
           ]),
+          _vm._v(" "),
+          _c("iframe", {
+            staticClass: "h-screen",
+            staticStyle: { width: "60%" },
+            attrs: {
+              src: _vm.episodeToshow.video_url,
+              frameborder: "0",
+              allow:
+                "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+              allowfullscreen: ""
+            }
+          }),
           _vm._v(" "),
           _c("div", { staticClass: "text-sm text-gray-400" }, [
             _vm._v(_vm._s(_vm.episodeToshow.description))
